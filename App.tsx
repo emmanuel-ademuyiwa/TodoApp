@@ -1,6 +1,14 @@
-import { StyleSheet, Text, View, SafeAreaView, StatusBar } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  StatusBar,
+  Button,
+} from "react-native";
 import AddTask from "./Components/AddTask/AddTask";
 import TitleBar from "./Components/TitleBar/TitleBar";
+import ToDos from "./Components/ToDos/ToDos";
 
 export default function App() {
   return (
@@ -9,6 +17,8 @@ export default function App() {
       <View style={styles.container}>
         <Text style={styles.text}>To-Do List</Text>
         <TitleBar />
+        <ToDos />
+        <Button title="Add Task" />
       </View>
     </SafeAreaView>
   );

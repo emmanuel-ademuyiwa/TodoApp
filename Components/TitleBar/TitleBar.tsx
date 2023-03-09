@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   activeText: {
-    borderBottomWidth: 5,
+    borderBottomWidth: 3,
     borderBottomColor: "#206fc9",
   },
 });
