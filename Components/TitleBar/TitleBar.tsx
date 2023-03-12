@@ -1,10 +1,13 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 
-const TitleBar = () => {
-  const [tab, setTab] = useState<number>(1);
-  const handleTab = (value: number) => setTab(value);
+interface Prop {
+  tab: number;
+  setTab: (value: number) => void;
+}
 
+const TitleBar = ({ tab, setTab }: Prop) => {
+  const handleTab = (value: number) => setTab(value);
   return (
     <View style={styles.container}>
       <View style={tab === 1 && styles.activeText}>
@@ -26,7 +29,7 @@ const TitleBar = () => {
 
       <View style={tab === 4 && styles.activeText}>
         <Text style={[styles.text]} onPress={() => handleTab(4)}>
-          Important
+          Starred
         </Text>
       </View>
     </View>

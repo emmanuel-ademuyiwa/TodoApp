@@ -1,41 +1,28 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  SafeAreaView,
-  StatusBar,
-  Button,
-} from "react-native";
-import AddTask from "./Components/AddTask/AddTask";
-import TitleBar from "./Components/TitleBar/TitleBar";
-import ToDos from "./Components/ToDos/ToDos";
+import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
+import store, { persistor } from "./redux/store";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import Mainpage from "./Pages/Mainpage/Mainpage";
+import { StatusBar } from "react-native";
+import AddTaskScreen from "./Pages/AddTaskScreen/AddTaskScreen";
+import { useLayoutEffect } from "react";
+import "react-native-gesture-handler";
+
+const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" />
-      <View style={styles.container}>
-        <Text style={styles.text}>To-Do List</Text>
-        <TitleBar />
-        <ToDos />
-        <Button title="Add Task" />
-      </View>
-    </SafeAreaView>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <StatusBar barStyle="light-content" />
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name="Mainpage" component={Mainpage} />
+            <Stack.Screen name="AddTask" component={AddTaskScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </PersistGate>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#0D121C" },
-  container: {
-    backgroundColor: "#0D121C",
-    height: "100%",
-    padding: 20,
-    color: "#fff",
-    gap: 24,
-  },
-  text: {
-    color: "white",
-    fontSize: 22,
-    fontWeight: "bold",
-  },
-});
