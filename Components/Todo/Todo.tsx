@@ -17,6 +17,7 @@ import {
   _TOGGLE_COMPLETE,
   _TOGGLE_STARRED,
 } from "../../redux/todo/todoActions";
+import * as Notifications from "expo-notifications";
 
 export interface Prop {
   task: {
@@ -36,45 +37,14 @@ const Todo = ({ task }: Prop) => {
   const dispatch: any = useDispatch();
   const navigation: any = useNavigation();
 
-  const [date, setDate] = useState(new Date());
-  const dateHHMMSS = date.toLocaleTimeString();
   const [isEnabled, setIsEnabled] = useState(task.completed);
-
-  const reminder = new Date(JSON.parse(task.selectedTime));
-  const reminderHHMMSS = reminder.toLocaleTimeString();
 
   const targetDate = new Date(JSON.parse(task.selectedDate));
   const targetDateFormatted = Moment(targetDate).format("MMMM Do, YYYY");
-  const currentDay = Moment(date).format("MMMM Do, YYYY");
 
   const toggle = () => {
     setIsEnabled((previousState: boolean) => !previousState);
   };
-
-  function refreshClock() {
-    setDate(new Date());
-  }
-
-  function checkReminder() {
-    if (reminderHHMMSS === dateHHMMSS) {
-      console.log("It's time");
-    }
-  }
-
-  function checkDay() {
-    if (targetDateFormatted === currentDay) {
-      checkReminder();
-    }
-  }
-
-  checkDay();
-
-  useEffect(() => {
-    const timerId = setInterval(refreshClock, 1000);
-    return function cleanup() {
-      clearInterval(timerId);
-    };
-  }, []);
 
   return (
     <View style={styles.container}>
