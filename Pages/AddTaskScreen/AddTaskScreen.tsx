@@ -1,4 +1,13 @@
-import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+  Keyboard,
+} from "react-native";
 import React, { useLayoutEffect, useState } from "react";
 import Moment from "moment";
 import AddTask from "../../Components/AddTask/AddTask";
@@ -20,15 +29,17 @@ const AddTaskScreen = () => {
   const [theTime, setTheTime] = useState<any>("");
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-
-        <AddTask
-          theDate={theDate}
-          theTime={theTime}
-          setTheDate={setTheDate}
-          setTheTime={setTheTime}
-        />
-      </View>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+          <AddTask
+            theDate={theDate}
+            theTime={theTime}
+            setTheDate={setTheDate}
+            setTheTime={setTheTime}
+          />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

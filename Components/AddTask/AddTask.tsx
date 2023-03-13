@@ -5,6 +5,9 @@ import {
   View,
   Switch,
   Pressable,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,6 +18,7 @@ import uuid from "react-native-uuid";
 import Moment from "moment";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from "@react-navigation/native";
+import { TouchableWithoutFeedback } from "react-native";
 
 interface Props {
   theDate: string;
@@ -61,134 +65,130 @@ const AddTask = ({ setTheDate, setTheTime, theDate, theTime }: Props) => {
     setTheTime(reminder);
   };
   return (
-    <View style={styles.container}>
-      <Text style={styles.titleText}>Add Task</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <Text style={styles.titleText}>Add Task</Text>
+        <Formik
+          enableReinitialize={editedData ? true : false}
+          initialValues={{
+            id: editedData?.id || uuid.v4(),
+            title: editedData?.title || "",
+            description: editedData?.description || "",
+            completed: editedData?.completed || false,
+            starred: editedData?.starred || false,
+          }}
+          validationSchema={Yup.object({
+            title: Yup.string().required("Required Field"),
+          })}
+          onSubmit={(values, { setErrors, resetForm }) => {
+            const newSelectedDate = JSON.stringify(selectedDate);
+            const newSelectedTime = JSON.stringify(selectedTime);
 
-      <Formik
-        enableReinitialize={editedData ? true : false}
-        initialValues={{
-          id: editedData?.id || uuid.v4(),
-          title: editedData?.title || "",
-          completed: editedData?.completed || false,
-          starred: editedData?.starred || false,
-        }}
-        validationSchema={Yup.object({
-          title: Yup.string().required("Required Field"),
-        })}
-        onSubmit={(values, { setErrors, resetForm }) => {
-          const { id, title, completed, starred } = values;
-          const newSelectedDate = JSON.stringify(selectedDate);
-          const newSelectedTime = JSON.stringify(selectedTime);
-
-          let errors = {};
-          if (
-            Object.entries(errors).length === 0 &&
-            errors.constructor === Object
-          ) {
-            dispatch(
-              _SAVE_TODO({
-                id,
-                title,
-                starred,
-                completed,
-                selectedTime: newSelectedTime,
-                selectedDate: newSelectedDate,
-              })
-            );
-            resetForm();
-            dispatch(_EDIT_DATA(""));
-            navigation.navigate("Mainpage");
-          } else {
-            setErrors(errors);
-          }
-        }}
-      >
-        {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
-          <>
-            <View style={styles.titleContainer}>
-              <TextInput
-                onChangeText={handleChange("title")}
-                onBlur={handleBlur("email")}
-                value={values.title}
-                placeholderTextColor="#fff"
-                placeholder="Task title"
-                style={
-                  errors.title
-                    ? [styles.textInput, styles.errorBorder]
-                    : styles.textInput
-                }
-              />
-              <Text style={styles.errorText}>
-                <ErrorMessage component={Text} name={"title"} />
-              </Text>
-            </View>
-
-            {/* <TextInput
-              placeholderTextColor="#fff"
-              placeholder="Description"
-              // editable
-              // multiline
-              // numberOfLines={4}
-              style={[styles.textInput]}
-              onChangeText={handleChange("description")}
-              onBlur={handleBlur("description")}
-              defaultValue={values.description}
-            /> */}
-            {/* <DatePicker setTheDate={setTheDate} setTheTime={setTheTime} /> */}
-            <View style={styles.pickerContainer}>
-              <View style={styles.dateContainer}>
-                <RNDateTimePicker
-                  onChange={setDate}
-                  themeVariant="dark"
-                  value={selectedDate}
+            let errors = {};
+            if (
+              Object.entries(errors).length === 0 &&
+              errors.constructor === Object
+            ) {
+              dispatch(
+                _SAVE_TODO({
+                  ...values,
+                  selectedTime: newSelectedTime,
+                  selectedDate: newSelectedDate,
+                })
+              );
+              resetForm();
+              dispatch(_EDIT_DATA(""));
+              navigation.navigate("Mainpage");
+            } else {
+              setErrors(errors);
+            }
+          }}
+        >
+          {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+            <>
+              <View style={styles.titleContainer}>
+                <TextInput
+                  onChangeText={handleChange("title")}
+                  onBlur={handleBlur("email")}
+                  value={values.title}
+                  placeholderTextColor="#fff"
+                  placeholder="Task title"
+                  style={styles.textInput}
                 />
+                <Text style={styles.errorText}>
+                  <ErrorMessage component={Text} name={"title"} />
+                </Text>
               </View>
-              <View style={styles.reminderContainer}>
-                <View style={styles.switchContainer}>
-                  <Text style={styles.text}>Set Reminder ?</Text>
-                  <Switch
-                    style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-                    trackColor={{ false: "#fff", true: "#fff" }}
-                    thumbColor={isEnabled ? "#2196F3" : "#f4f3f4"}
-                    ios_backgroundColor="#3e3e3e"
-                    onValueChange={toggleSwitch}
-                    value={isEnabled}
+
+              <TextInput
+                placeholderTextColor="#fff"
+                placeholder="Description"
+                editable
+                multiline
+                numberOfLines={4}
+                style={[styles.textInput, styles.multiLineTextInput]}
+                onChangeText={handleChange("description")}
+                onBlur={handleBlur("description")}
+                defaultValue={values.description}
+              />
+
+              {/* <DatePicker setTheDate={setTheDate} setTheTime={setTheTime} /> */}
+
+              <View style={styles.pickerContainer}>
+                <View style={styles.dateContainer}>
+                  <RNDateTimePicker
+                    onChange={setDate}
+                    themeVariant="dark"
+                    value={selectedDate}
                   />
                 </View>
+                <View style={styles.reminderContainer}>
+                  <View style={styles.switchContainer}>
+                    <Text style={styles.text}>Set Reminder ?</Text>
+                    <Switch
+                      style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+                      trackColor={{ false: "#fff", true: "#fff" }}
+                      thumbColor={isEnabled ? "#2196F3" : "#f4f3f4"}
+                      ios_backgroundColor="#3e3e3e"
+                      onValueChange={toggleSwitch}
+                      value={isEnabled}
+                    />
+                  </View>
 
-                {isEnabled && (
-                  <RNDateTimePicker
-                    onChange={setTime}
-                    themeVariant="dark"
-                    value={selectedTime}
-                    mode="time"
-                  />
-                )}
+                  {isEnabled && (
+                    <RNDateTimePicker
+                      onChange={setTime}
+                      themeVariant="dark"
+                      value={selectedTime}
+                      mode="time"
+                    />
+                  )}
+                </View>
               </View>
-            </View>
 
-            <View style={styles.modalCloseBtnContainer}>
-              <Pressable
-                style={styles.buttonOpen}
-                onPress={() => handleSubmit()}
-              >
-                <Text style={styles.textStyle}>{"Save Task"}</Text>
-              </Pressable>
+              <View style={styles.modalCloseBtnContainer}>
+                <Pressable
+                  style={styles.buttonOpen}
+                  onPress={() => handleSubmit()}
+                >
+                  <Text style={styles.textStyle}>{"Save Task"}</Text>
+                </Pressable>
 
-              <Pressable
-                style={styles.buttonOpen}
-                onPress={() => {
-                  navigation.navigate("Mainpage");
-                  dispatch(_EDIT_DATA(""));
-                }}
-              >
-                <Text style={styles.textStyle}>Cancel</Text>
-              </Pressable>
-            </View>
-          </>
-        )}
-      </Formik>
-    </View>
+                <Pressable
+                  style={styles.buttonOpen}
+                  onPress={() => {
+                    navigation.navigate("Mainpage");
+                    dispatch(_EDIT_DATA(""));
+                  }}
+                >
+                  <Text style={styles.textStyle}>Cancel</Text>
+                </Pressable>
+              </View>
+            </>
+          )}
+        </Formik>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -249,6 +249,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-between",
+    marginBottom: 20,
   },
   textStyle: {
     color: "white",

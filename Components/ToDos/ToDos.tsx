@@ -77,7 +77,7 @@ const ToDos = ({ tab }: Props) => {
     >
       {tasks?.length < 1 || tasks === undefined ? (
         <View style={styles.noDataContainer}>
-          <Image source={require("../../assets/empty.png")} />
+          <Image source={require("../../assets/no-data.png")} />
           <Text style={styles.text}>No data</Text>
         </View>
       ) : (
